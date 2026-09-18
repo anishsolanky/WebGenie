@@ -1,0 +1,23 @@
+# Environment variables (secrets — never commit)
+.env
+.env.local
+*.env
+!.env.example
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
