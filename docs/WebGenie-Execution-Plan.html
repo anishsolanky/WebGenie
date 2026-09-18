@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WebGenie Execution Plan</title>
+<style>
+  @page { size: A4; margin: 20mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Urbanist", Arial, sans-serif;
+    color: #1e2530;
+    font-size: 10.8pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  h1, h2, h3, h4 { font-family: "Segoe UI Semibold", "Segoe UI", Arial, sans-serif; color: #14161f; }
+  h1 { font-size: 24pt; margin: 0 0 4px 0; }
+  h2 {
+    font-size: 15pt; margin: 0 0 10px 0; padding-bottom: 6px;
+    border-bottom: 2.5px solid #4f46e5; color: #4338ca;
+  }
+  h3 { font-size: 12.5pt; margin: 18px 0 6px 0; color: #14161f; }
+  h4 { font-size: 11pt; margin: 12px 0 4px 0; }
+  p { margin: 6px 0; }
+  .section { page-break-before: always; padding-top: 4px; }
+  .no-break-before { page-break-before: avoid; }
+  .cover { page-break-after: always; padding-top: 30%; text-align: center; }
+  .cover .tag {
+    display: inline-block; background: #eef2ff; color: #4338ca; font-weight: 600;
+    font-size: 9.5pt; letter-spacing: 0.06em; text-transform: uppercase;
+    border-radius: 999px; padding: 5px 16px; margin-bottom: 18px;
+  }
+  .cover h1 { font-size: 34pt; }
+  .cover .sub { font-size: 13pt; color: #475569; margin-top: 6px; }
+  .cover .meta { margin-top: 60px; font-size: 10pt; color: #64748b; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px 0; font-size: 9.6pt; }
+  th, td { border: 1px solid #d8dee9; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #eef2ff; color: #3730a3; font-weight: 600; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    background: #f1f5f9; color: #4338ca; padding: 1px 5px; border-radius: 4px; font-size: 9.3pt;
+  }
+  pre {
+    background: #0f172a; color: #e2e8f0; padding: 10px 13px; border-radius: 8px;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace; font-size: 8.9pt;
+    line-height: 1.5; overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+    margin: 8px 0 14px 0;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  .folder {
+    background: #f8fafc; border: 1px solid #d8dee9; border-radius: 8px;
+    padding: 10px 13px; font-family: "Cascadia Code", Consolas, monospace; font-size: 8.9pt;
+    white-space: pre; line-height: 1.55; margin: 8px 0 14px 0; overflow-x: auto;
+  }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 3px 0; }
+  .callout {
+    border-left: 4px solid #4f46e5; background: #eef2ff; border-radius: 0 8px 8px 0;
+    padding: 8px 12px; margin: 10px 0; font-size: 9.8pt;
+  }
+  .warn {
+    border-left: 4px solid #d97706; background: #fffbeb; border-radius: 0 8px 8px 0;
+    padding: 8px 12px; margin: 10px 0; font-size: 9.8pt;
+  }
+  .phase {
+    border: 1.5px solid #d8dee9; border-radius: 10px; padding: 14px 16px; margin: 14px 0;
+    page-break-inside: avoid;
+  }
+  .phase-head {
+    display: block; font-size: 13.5pt; font-weight: 700; color: #4338ca; margin-bottom: 2px;
+  }
+  .phase-sub { font-size: 9.5pt; color: #64748b; margin-bottom: 10px; }
+  .tag-row { margin: 4px 0 10px 0; }
+  .badge {
+    display: inline-block; font-size: 8.3pt; font-weight: 700; letter-spacing: 0.03em;
+    text-transform: uppercase; padding: 3px 9px; border-radius: 5px; margin-right: 6px;
+  }
+  .badge-manual { background: #fef3c7; color: #92400e; }
+  .badge-code { background: #dbeafe; color: #1e40af; }
+  .badge-test { background: #dcfce7; color: #166534; }
+  .badge-none { background: #f1f5f9; color: #64748b; }
+  .subblock { margin: 8px 0 10px 14px; }
+  .subblock-title { font-weight: 700; font-size: 10.2pt; margin-bottom: 3px; }
+  .toc-list { list-style: none; padding-left: 0; }
+  .toc-list li { margin: 6px 0; font-size: 10.5pt; }
+  .toc-list .num { display: inline-block; width: 26px; color: #4f46e5; font-weight: 700; }
+  .chunk-banner {
+    background: #4338ca; color: white; padding: 8px 14px; border-radius: 8px;
+    font-weight: 700; font-size: 10.5pt; margin: 22px 0 4px 0;
+  }
+  .small { font-size: 9pt; color: #64748b; }
+  .checklist li::marker { content: "☐  "; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="tag">Execution Plan</div>
+  <h1>WebGenie</h1>
+  <div class="sub">AI Website Builder — Full-Stack Build Guide</div>
+  <div class="sub">React + Vite + FastAPI + MongoDB Atlas + OpenRouter</div>
+  <div class="meta">Prepared for Anish · September 2026<br>Repo: <code>WebGenie</code> · Local build, deploy later</div>
+</div>
+
+<!-- TOC -->
+<div class="section no-break-before" style="page-break-before: avoid;">
+<h2>Table of Contents</h2>
+<ol class="toc-list">
+  <li><span class="num">0</span> How This Plan Works (Manual → Code → Test)</li>
+  <li><span class="num">1</span> What WebGenie Is</li>
+  <li><span class="num">2</span> Tech Stack &amp; All Packages</li>
+  <li><span class="num">3</span> Complete Folder Structure (Client + Server) &amp; Component/Page Folder Convention</li>
+  <li><span class="num">4</span> Data Model — MongoDB Documents</li>
+  <li><span class="num">5</span> REST API Contract</li>
+  <li><span class="num">6</span> WebSocket Message Contracts</li>
+  <li><span class="num">7</span> Design System</li>
+  <li><span class="num">8</span> Verified Technical Notes &amp; Gotchas</li>
+  <li><span class="num">9</span> Phase 0 → Phase 12: Step-by-Step Build Plan</li>
+  <li><span class="num">10</span> Final End-to-End Test Checklist</li>
+  <li><span class="num">11</span> Resume Bullet (once built)</li>
+</ol>
+</div>
+
+<!-- 0 -->
+<div class="section">
+<h2>0. How This Plan Works</h2>
+<p>Every phase below is a <b>self-contained, visible deliverable</b> — you never move to the next phase until the current one is coded and you've verified it works, including how it looks. Each phase is split into three parts:</p>
+<table>
+  <tr><th style="width:110px">Label</th><th>Meaning</th></tr>
+  <tr><td><span class="badge badge-manual">Manual — You</span></td><td>Something only you can do: creating accounts, clicking through a cloud console, copying an API key. Claude Code cannot do these for you.</td></tr>
+  <tr><td><span class="badge badge-code">Code — Us</span></td><td>Everything else: scaffolding, installing packages, writing files, running dev servers. Done together in the coding session — Claude Code runs the terminal commands and writes the files directly.</td></tr>
+  <tr><td><span class="badge badge-test">Test — You</span></td><td>You open the browser (and sometimes the database) and confirm the phase's checkpoint actually works, including how the UI looks and feels, before we move on.</td></tr>
+</table>
+<div class="callout">
+Rule of thumb: if a step needs a browser tab open to a third-party website (MongoDB Atlas, OpenRouter) or a decision only you can make, it's <b>Manual</b>. If it's a terminal command or a file inside this repo, it's <b>Code</b> and happens in the session.
+</div>
+</div>
+
+<!-- 1 -->
+<div class="section">
+<h2>1. What WebGenie Is</h2>
+<p>A SaaS web app where a user types a prompt like <i>"create a developer portfolio website"</i> and the AI:</p>
+<ol>
+  <li><b>Plans</b> a file structure (which components the site needs)</li>
+  <li><b>Generates each file's code in parallel</b>, streaming progress to the UI in real time</li>
+  <li><b>Renders the result live</b> using Sandpack (an in-browser React sandbox, not a static preview)</li>
+  <li>Lets the user <b>manually edit code</b> in Sandpack's built-in editor, or</li>
+  <li>Continue <b>chatting with the AI</b> to revise the site (AI returns precise create/update/delete file operations, not a full rewrite)</li>
+  <li><b>Export</b> the project as a downloadable Vite+React zip, or <b>Publish</b> it read-only</li>
+</ol>
+<p class="small">Learning path this plan follows: Basic React Project → Pages/Routing → Login/Register UI → Home Page UI → Builder Page → Preview/Publish Page → Backend Server → Auth APIs → AI Build API → OpenRouter Integration → Agent Chat API → Full Integration.</p>
+</div>
+
+<!-- 2 -->
+<div class="section">
+<h2>2. Tech Stack &amp; All Packages</h2>
+<table>
+<tr><th>Layer</th><th>Choice</th><th>Notes</th></tr>
+<tr><td>Frontend</td><td>React 18 + TypeScript + Vite</td><td>React pinned to 18, not Vite's default 19 (Sandpack compatibility — see §8); <code>react-ts</code> Vite template</td></tr>
+<tr><td>Styling</td><td>Tailwind CSS v4</td><td>CSS-first config, no <code>tailwind.config.js</code></td></tr>
+<tr><td>Routing</td><td>React Router v6</td><td>Installed explicitly as <code>@6</code> (plain install grabs v7); ships its own types</td></tr>
+<tr><td>Global state</td><td>Redux Toolkit + react-redux</td><td>Typed store/slices for auth session + active project — see §3, §8</td></tr>
+<tr><td>HTTP client</td><td>Axios</td><td><code>withCredentials: true</code>, cookie-based sessions</td></tr>
+<tr><td>Live preview + editor</td><td>Sandpack (<code>@codesandbox/sandpack-react</code>)</td><td>Frontend-only in-browser bundler/sandbox</td></tr>
+<tr><td>Export</td><td>JSZip + file-saver</td><td>100% client-side, builds a real Vite project zip</td></tr>
+<tr><td>Backend framework</td><td>FastAPI (Python)</td><td>Async, auto-docs at <code>/docs</code></td></tr>
+<tr><td>Database</td><td>MongoDB Atlas (free M0 cluster)</td><td>Async driver: Motor</td></tr>
+<tr><td>Auth</td><td>JWT in httpOnly cookie</td><td>passlib[bcrypt] + python-jose</td></tr>
+<tr><td>Real-time updates</td><td>WebSocket (native FastAPI)</td><td>plan → file_start → file_complete → done</td></tr>
+<tr><td>AI model</td><td>OpenRouter free model</td><td>One specific pinned model id, not the <code>:free</code> router</td></tr>
+<tr><td>Structured AI output</td><td><code>instructor</code> + Pydantic</td><td>Patches an OpenAI-compatible client to validate model output into a schema</td></tr>
+</table>
+
+<h3>Frontend packages (installed across Phases 1–5)</h3>
+<pre>react@18
+react-dom@18
+tailwindcss
+@tailwindcss/vite
+react-router-dom@6
+@reduxjs/toolkit
+react-redux
+clsx
+tailwind-merge
+axios
+@codesandbox/sandpack-react
+jszip
+file-saver
+
+# dev dependencies (types)
+@types/react@18
+@types/react-dom@18
+@types/file-saver</pre>
+
+<h3>Backend packages — <code>server/requirements.txt</code> (Phase 7)</h3>
+<pre>fastapi[standard]
+motor
+pydantic
+python-dotenv
+passlib[bcrypt]
+bcrypt==4.0.1
+python-jose[cryptography]==3.3.0
+instructor
+openai</pre>
+<p class="small">Pins on <code>bcrypt</code> and <code>python-jose</code> avoid known crashes/security gaps — see §8.</p>
+</div>
+
+<!-- 3 -->
+<div class="section">
+<h2>3. Complete Folder Structure</h2>
+<div class="callout">
+This project uses <b>TypeScript</b> (not plain JS) and <b>Redux Toolkit</b> (not Context) for global state — the "best practice" stack. The folder categories follow the organizing principle you asked for (one clear home per kind of code): <code>pages/</code> are full screens, <code>components/</code> are their reusable building blocks, <code>services/</code> is the only place that talks to the backend, <code>store/</code> holds Redux state shared across screens, <code>constants/</code> centralizes routes/endpoints/keys, <code>hooks/</code> holds reusable React logic, <code>types/</code> holds shared TypeScript types, and <code>utils/</code> holds plain framework-free helpers. Every entry under <code>components/</code> and <code>pages/</code> is itself a folder, not a flat file — see §3.1 right after the tree.
+</div>
+
+<h3>Client — <code>client/src/</code></h3>
+<div class="folder">src/
+├── main.tsx               # App entry — boots React, Router, and the Redux &lt;Provider&gt;
+├── App.tsx                # Top-level layout: Navbar + route outlet
+├── assets/                # Static images/icons (e.g. logo.svg)
+├── components/            # Reusable UI pieces — one FOLDER per component (§3.1)
+│   ├── Navbar/
+│   ├── ProtectedRoute/       # Route guard — logic only, no .styles.ts
+│   ├── ProjectCard/
+│   ├── ChatPanel/            # Left panel of Builder page
+│   ├── BuilderToolbar/       # Save / Preview / Download / Publish buttons
+│   └── DeviceToggle/
+├── constants/             # Fixed values, defined once
+│   ├── routes.ts             # ROUTES.HOME, ROUTES.LOGIN, ROUTES.BUILDER(id), ...
+│   ├── apiEndpoints.ts       # API_ENDPOINTS.AUTH.LOGIN, ...
+│   └── storageKeys.ts        # localStorage key names
+├── hooks/                 # Reusable React hooks
+│   ├── useAuth.ts            # Thin hook wrapping the auth slice
+│   ├── useWebSocket.ts       # Generic WS connect/subscribe/cleanup hook
+│   └── useDebounce.ts        # Debounced value, used for autosave in Builder
+├── pages/                 # One FOLDER per route, same pattern as components/ (§3.1)
+│   ├── HomePage/
+│   ├── LoginPage/
+│   ├── RegisterPage/
+│   ├── MyProjectsPage/
+│   ├── CommunityPage/
+│   ├── BuilderPage/          # Sandpack lives here
+│   ├── PublicPreviewPage/
+│   └── NotFoundPage/
+├── routes/                # The single route table
+│   └── AppRoutes.tsx
+├── services/              # The API layer — ALL backend calls live here
+│   ├── api.ts                # axios instance (baseURL '/api', withCredentials)
+│   ├── authService.ts        # register/login/logout/me
+│   ├── projectService.ts     # list/create/get/publish/delete/saveFiles
+│   └── socketService.ts      # builds ws:// URLs for generate/chat sockets
+├── store/                 # Global state shared across screens (Redux Toolkit)
+│   ├── index.ts              # configureStore + RootState/AppDispatch types
+│   ├── hooks.ts              # typed useAppDispatch / useAppSelector
+│   └── slices/
+│       ├── authSlice.ts      # { user, status } + login/register/logout thunks
+│       └── projectSlice.ts   # active project + files/messages/version state
+├── styles/
+│   └── index.css             # Tailwind import + GLOBAL/SHARED design system (§7) —
+│                              # the one place common classes (.btn-primary, .card, ...) live
+├── types/                 # Shared TypeScript types
+│   ├── auth.types.ts         # User, AuthState
+│   ├── project.types.ts      # Project, FileEntry, Message (mirrors Mongo schema)
+│   └── api.types.ts          # shared request/response shapes
+└── utils/                 # Pure helper functions
+    ├── cn.ts                 # shared class-merge helper (clsx + tailwind-merge), see §3.1
+    ├── sandpackUtils.ts      # maps {content,hash} -> Sandpack's {code} shape
+    ├── exportProject.ts      # builds & downloads the Vite+React zip
+    └── validators.ts         # email/password/prompt validation helpers
+</div>
+
+<h3>3.1 — Component &amp; Page Folder Convention</h3>
+<p>Every component and page is its own folder of exactly three files (a fourth only if genuinely needed — e.g. a page-local constants file):</p>
+<div class="folder">ComponentName/
+├── ComponentName.tsx        # component logic/JSX
+├── ComponentName.styles.ts  # named string constants — the ONLY place literal Tailwind classes live
+└── index.ts                 # export { default } from "./ComponentName";</div>
+<pre>// ComponentName.styles.ts
+export const styles = {
+  container: "flex items-center justify-between p-4 rounded-lg border border-border",
+  title: "text-lg font-semibold text-ink-900",
+} as const;
+
+// ComponentName.tsx
+import { styles } from "./ComponentName.styles";
+&lt;div className={styles.container}&gt;
+  &lt;h2 className={styles.title}&gt;{title}&lt;/h2&gt;
+&lt;/div&gt;</pre>
+<div class="warn">
+<b>Why this is a hard rule, not a style preference:</b> Tailwind v4's scanner statically greps source files for complete class-name strings to decide what CSS to generate — it cannot resolve runtime interpolation. <code>`text-${color}-500`</code> silently produces <b>no CSS</b> for that class. So every string in a <code>.styles.ts</code> file must be a complete, literal class list. For a class that varies by prop/state, don't interpolate a fragment — pick between fully-written literal strings via a lookup map or function:
+<pre>const STATUS_COLOR: Record&lt;Status, string&gt; = {
+  generating: "text-primary-600",
+  completed: "text-ink-700",
+  failed: "text-red-600",
+};
+export const styles = {
+  badge: (status: Status) => `${STATUS_COLOR[status]} text-xs font-semibold`,
+} as const;</pre>
+The function's return value is computed at runtime, but every fragment it's built from is a complete literal the scanner can see somewhere in the file — that's what the scanner actually needs, not a static final string.
+</div>
+<p>When a caller-supplied <code>className</code> needs to merge with a component's own classes, use the shared <code>cn()</code> helper (<code>clsx</code> + <code>tailwind-merge</code>, in <code>utils/cn.ts</code>) instead of string concatenation: <code>className={cn(styles.container, className)}</code>.</p>
+<p><b>Shared/common classes stay in <code>styles/index.css</code></b> (§7's <code>.btn-primary</code>/<code>.btn-secondary</code>/<code>.card</code>/<code>.input-field</code>) — never duplicated per component. A component's own <code>.styles.ts</code> can reference them as literal strings alongside its component-specific classes, e.g. <code>submitButton: "btn-primary w-full"</code>.</p>
+<p>A component with no meaningful styling of its own (e.g. <code>ProtectedRoute</code>, a pure logic wrapper) skips <code>.styles.ts</code> entirely — don't create an empty file. If two pages end up duplicating the same non-trivial class strings (e.g. Login/Register share form styling), factor the shared ones into <code>styles/shared.styles.ts</code> and import from both — add this only once duplication actually shows up, not preemptively.</p>
+
+<h3>Server — <code>server/app/</code></h3>
+<div class="folder">server/
+├── app/
+│   ├── main.py            # FastAPI app, CORS, router mounting
+│   ├── config.py          # loads .env (Mongo URI, OpenRouter key, JWT secret)
+│   ├── database.py        # Motor client + collection getters
+│   ├── models.py          # Pydantic document models (User, Project, FileEntry, Message)
+│   ├── auth/
+│   │   ├── security.py       # password hashing, JWT encode/decode
+│   │   └── dependencies.py   # get_current_user() from cookie
+│   ├── routers/
+│   │   ├── auth_router.py
+│   │   ├── projects_router.py
+│   │   ├── community_router.py
+│   │   └── ws_router.py       # the two WebSocket endpoints
+│   └── ai/
+│       ├── schemas.py         # Pydantic: FilePlanSchema, FileCodeSchema, RevisionResultSchema, FileOpSchema
+│       ├── prompts.py         # system prompts (design-quality rules)
+│       ├── service.py         # generate_project(), revise_project()
+│       ├── normalizer.py      # fixes double-escaped newlines/quotes
+│       ├── validator.py       # auto-fixes class=, void tags, default export
+│       └── diff.py            # apply_operations(), md5 hashing
+├── requirements.txt
+└── .env                   # MONGODB_URI, JWT_SECRET, OPENROUTER_API_KEY, ...
+</div>
+</div>
+
+<!-- 4 -->
+<div class="section">
+<h2>4. Data Model — MongoDB Documents</h2>
+<h3>Collection: <code>users</code></h3>
+<pre>{
+  "_id": "ObjectId",
+  "name": "string",
+  "email": "string (unique, indexed)",
+  "hashed_password": "string (bcrypt)",
+  "created_at": "datetime"
+}</pre>
+<h3>Collection: <code>projects</code></h3>
+<pre>{
+  "_id": "ObjectId",
+  "owner_id": "ObjectId (ref: users._id)",
+  "name": "string",
+  "description": "string (the original prompt)",
+  "version": "int (incremented on every AI or manual edit)",
+  "status": "generating | completed | failed",
+  "published": "bool",
+  "files": {
+    "/App.js": { "content": "string", "hash": "string (md5, first 12 chars)" },
+    "/styles.css": { "content": "string", "hash": "string" }
+  },
+  "messages": [
+    { "role": "user", "content": "string", "timestamp": "datetime" },
+    { "role": "assistant", "content": "string", "timestamp": "datetime" }
+  ],
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}</pre>
+<p class="small">Files and messages are embedded directly in the project document (not separate collections) so one query loads everything the Builder page needs.</p>
+</div>
+
+<!-- 5 -->
+<div class="section">
+<h2>5. REST API Contract</h2>
+<table>
+<tr><th>Method</th><th>Path</th><th>Auth</th><th>Purpose</th></tr>
+<tr><td>POST</td><td><code>/api/auth/register</code></td><td>No</td><td><code>{name,email,password}</code> → creates user, sets cookie, returns <code>{user}</code></td></tr>
+<tr><td>POST</td><td><code>/api/auth/login</code></td><td>No</td><td><code>{email,password}</code> → verifies, sets cookie, returns <code>{user}</code></td></tr>
+<tr><td>POST</td><td><code>/api/auth/logout</code></td><td>Yes</td><td>Clears session cookie</td></tr>
+<tr><td>GET</td><td><code>/api/auth/me</code></td><td>Yes</td><td>Returns current user (session restore on refresh)</td></tr>
+<tr><td>GET</td><td><code>/api/projects</code></td><td>Yes</td><td>List current user's projects (summary fields only)</td></tr>
+<tr><td>POST</td><td><code>/api/projects</code></td><td>Yes</td><td><code>{prompt}</code> → creates shell in <code>generating</code>, returns <code>{project_id}</code></td></tr>
+<tr><td>WS</td><td><code>/ws/projects/{id}/generate</code></td><td>Yes</td><td>Streams plan/file_start/file_complete/done events</td></tr>
+<tr><td>GET</td><td><code>/api/projects/{id}</code></td><td>Yes (owner)</td><td>Full project incl. files + messages</td></tr>
+<tr><td>WS</td><td><code>/ws/projects/{id}/chat</code></td><td>Yes (owner)</td><td>Agent Chat API — revision prompt in, file ops out</td></tr>
+<tr><td>PUT</td><td><code>/api/projects/{id}/files</code></td><td>Yes (owner)</td><td>Manual code-editor save</td></tr>
+<tr><td>PATCH</td><td><code>/api/projects/{id}/publish</code></td><td>Yes (owner)</td><td>Toggle <code>published</code></td></tr>
+<tr><td>GET</td><td><code>/api/projects/public/{id}</code></td><td>No</td><td>Read-only published view</td></tr>
+<tr><td>DELETE</td><td><code>/api/projects/{id}</code></td><td>Yes (owner)</td><td>Delete project</td></tr>
+</table>
+<p class="small">Export has <b>no backend endpoint</b> — handled entirely client-side by <code>utils/exportProject.js</code>.</p>
+</div>
+
+<!-- 6 -->
+<div class="section">
+<h2>6. WebSocket Message Contracts</h2>
+<h3><code>/ws/projects/{id}/generate</code></h3>
+<pre>// server -> client, in order
+{ "type": "plan", "files": ["/App.js", "/styles.css", "/components/Header.js"] }
+{ "type": "file_start", "path": "/App.js" }
+{ "type": "file_complete", "path": "/App.js", "code": "..." }
+{ "type": "file_start", "path": "/styles.css" }
+{ "type": "file_complete", "path": "/styles.css", "code": "..." }
+{ "type": "done", "project": { "...": "full project document" } }</pre>
+<h3><code>/ws/projects/{id}/chat</code></h3>
+<pre>// client -> server
+{ "prompt": "make the header dark blue" }
+
+// server -> client
+{
+  "type": "revision_done",
+  "operations": [
+    { "op": "update", "path": "/components/Header.js", "search": "...", "replace": "..." }
+  ],
+  "project": { "...": "updated project document, version bumped" }
+}</pre>
+</div>
+
+<!-- 7 -->
+<div class="section">
+<h2>7. Design System</h2>
+<p>Applied from Phase 2 onward in <code>src/styles/index.css</code>. CSS-variable-driven Tailwind v4 theme — no component library, no <code>tailwind.config.js</code>.</p>
+<pre>@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&amp;display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-ink-900: #0f172a;
+  --color-ink-700: #334155;
+  --color-ink-400: #94a3b8;
+  --color-surface-0: #ffffff;
+  --color-surface-50: #f8fafc;
+  --color-surface-100: #f1f5f9;
+  --color-border: #e2e8f0;
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+}
+
+body { @apply bg-surface-50 text-ink-900 font-sans antialiased; }
+.btn-primary { @apply inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:pointer-events-none; }
+.btn-secondary { @apply inline-flex items-center justify-center rounded-lg border border-border bg-surface-0 px-4 py-2 text-sm font-semibold text-ink-700 hover:bg-surface-100 transition-colors; }
+.card { @apply rounded-card border border-border bg-surface-0 p-6 shadow-card; }
+.input-field { @apply w-full rounded-lg border border-border bg-surface-0 px-3 py-2 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-primary-500; }</pre>
+<p>Every page/component reuses <code>.btn-primary</code> / <code>.btn-secondary</code> / <code>.card</code> / <code>.input-field</code> instead of ad-hoc Tailwind strings, so the whole app reads as one consistent system.</p>
+</div>
+
+<!-- 8 -->
+<div class="section">
+<h2>8. Verified Technical Notes &amp; Gotchas</h2>
+<p class="small">These were checked against current (Sept 2026) package behavior rather than assumed — keep them in mind as the relevant phase comes up.</p>
+<div class="warn"><b>React 18, not 19.</b> <code>npm create vite</code> scaffolds React 19 by default, but <code>@codesandbox/sandpack-react</code>'s peer deps top out at React 18 (the project is effectively unmaintained). Immediately after scaffolding in Phase 1: <code>npm install react@18 react-dom@18</code>.</div>
+<div class="warn"><b>Tailwind v4 has no config file.</b> No <code>tailwind.config.js</code>, no PostCSS setup, no <code>npx tailwindcss init</code>. Just <code>@tailwindcss/vite</code> as a Vite plugin + <code>@theme {}</code> in CSS.</div>
+<div class="warn"><b>Sandpack's <code>files</code> prop expects <code>{code}</code>, not <code>{content}</code>.</b> Our Mongo schema stores <code>content</code>; <code>sandpackUtils.js</code> must map between the two. Also put <code>key={project.version}</code> on <code>SandpackProvider</code> so every edit forces a clean remount (files aren't reliably reactive otherwise). Use <code>template="react"</code> (classic bundler) for the live preview — faster than <code>vite-react</code> for many small hot-swapped files.</div>
+<div class="warn"><b>Cross-origin cookies are fragile on localhost.</b> Frontend (:5173) and backend (:8000) are different origins. Instead of fighting <code>SameSite=None; Secure</code> on plain HTTP, proxy both REST and WS through Vite's dev server so the browser only ever talks to :5173:
+<pre>// client/vite.config.js
+server: {
+  proxy: {
+    '/api': { target: 'http://localhost:8000', changeOrigin: true },
+    '/ws':  { target: 'ws://localhost:8000', ws: true },
+  },
+}</pre>
+Then the cookie can simply be <code>httponly=True, samesite="lax", secure=False</code> for local dev.</div>
+<div class="warn"><b><code>instructor</code> + OpenRouter:</b> use the current, non-deprecated pattern:
+<pre>client = instructor.from_provider(
+    f"openrouter/{settings.OPENROUTER_MODEL}",
+    base_url="https://openrouter.ai/api/v1",
+    api_key=settings.OPENROUTER_API_KEY,
+    async_client=True,
+)
+result = await client.chat.completions.create(
+    response_model=FilePlanSchema,
+    messages=[...],
+    extra_body={"provider": {"require_parameters": True}},
+)</pre>
+The <code>extra_body</code> line forces the routed free model to actually honor structured-output params — without it some free models silently ignore the schema.</div>
+<div class="warn"><b>Pin one exact free model id — never <code>openrouter/free</code>.</b> That meta-router picks randomly among free models each call, which breaks a schema-constrained pipeline. Browse <code>openrouter.ai/models</code>, filter Free + Tool-calling, copy one id into <code>.env</code> as <code>OPENROUTER_MODEL</code> (Phase 0).</div>
+<div class="warn"><b><code>requirements.txt</code> pins that prevent crashes:</b> <code>bcrypt==4.0.1</code> (newer bcrypt removed an attribute <code>passlib</code> reads, crashing on first hash/verify) and <code>python-jose[cryptography]==3.3.0</code> (use the real crypto backend, not the pure-Python fallback).</div>
+<div class="warn"><b>Windows PowerShell venv activation.</b> <code>.\venv\Scripts\Activate.ps1</code> fails on a fresh machine with an execution-policy error. Run <code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code> immediately before activating (process-scoped, no admin rights needed).</div>
+<div class="warn"><b>Install React Router explicitly as v6.</b> Plain <code>npm install react-router-dom</code> grabs v7 by default; run <code>npm install react-router-dom@6</code>. It ships its own TypeScript types.</div>
+<div class="warn"><b>TypeScript scaffold + type packages.</b> Use <code>npm create vite@latest client -- --template react-ts</code> (not <code>react</code>). After pinning React to 18, also install matching types: <code>npm install -D @types/react@18 @types/react-dom@18</code>. Sandpack and Axios ship their own types; <code>file-saver</code> does not, so add <code>npm install -D @types/file-saver</code>.</div>
+<div class="warn"><b>Redux Toolkit pattern.</b> <code>store/index.ts</code> builds the store with <code>configureStore</code> and exports <code>RootState</code>/<code>AppDispatch</code> inferred from it. <code>store/hooks.ts</code> exports typed <code>useAppDispatch</code>/<code>useAppSelector</code> — components use these, never the raw untyped <code>useDispatch</code>/<code>useSelector</code>. Each domain gets its own slice (<code>authSlice.ts</code>, <code>projectSlice.ts</code>) built with <code>createSlice</code> + <code>createAsyncThunk</code> for API calls, so <code>services/</code> stays plain request functions and the slice owns loading/error state.</div>
+<div class="warn"><b>Every component/page is a folder, not a flat file — see §3.1 for the full convention.</b> In short: <code>Name/Name.tsx</code> + <code>Name.styles.ts</code> (named Tailwind class-string constants) + <code>index.ts</code> (re-export). Requires <code>clsx</code> + <code>tailwind-merge</code> for the shared <code>cn()</code> class-merge helper in <code>utils/cn.ts</code>.</div>
+</div>
+
+<!-- 9: PHASES -->
+<div class="section">
+<h2>9. Phase 0 → Phase 12: Step-by-Step Build Plan</h2>
+<p class="small">Confirmed local toolchain: Node v22.13.1, npm 11.6.4, Python 3.13.0 — all sufficient, no installs needed for those.</p>
+
+<div class="chunk-banner">CHUNK 0 — Setup (no code, no UI yet)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 0 — Accounts &amp; Environment</span>
+  <span class="phase-sub">Deliverable: five credential values ready in hand. No UI checkpoint — this phase is pure setup.</span>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-manual">Manual — You</span></div>
+    <ul>
+      <li>Create a <b>MongoDB Atlas</b> account → free <b>M0</b> cluster → create a DB user (username/password) → Network Access: allow your current IP (or <code>0.0.0.0/0</code> for local dev convenience) → copy the connection string (<code>mongodb+srv://...</code>) → decide a database name, e.g. <code>webgenie</code>.</li>
+      <li>Create an <b>OpenRouter</b> account at openrouter.ai → generate an API key.</li>
+      <li>Browse <code>openrouter.ai/models</code>, filter <b>Free</b> + <b>Tool calling</b>, pick one specific current model id (not <code>openrouter/free</code>) and write it down.</li>
+      <li>Generate a random 32+ character JWT secret string.</li>
+      <li>Confirm you have the five values ready: <code>MONGODB_URI</code>, <code>MONGODB_DB_NAME</code>, <code>JWT_SECRET</code>, <code>OPENROUTER_API_KEY</code>, <code>OPENROUTER_MODEL</code>.</li>
+    </ul>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-none">Code</span></div>
+    <p>None — nothing to build yet.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Log into the Atlas dashboard and confirm the M0 cluster shows "Active"; confirm the OpenRouter dashboard shows your new key.</p>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 1 — Frontend Shell (Phases 1–3)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 1 — Vite + React + TypeScript Scaffold + Design System</span>
+  <span class="phase-sub">Deliverable: a styled placeholder page proving the toolchain works.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>client/vite.config.ts</code>, <code>tsconfig.json</code> (generated), <code>src/styles/index.css</code>, <code>src/utils/cn.ts</code>, <code>src/main.tsx</code>, <code>src/App.tsx</code>.</p>
+    <pre>npm create vite@latest client -- --template react-ts
+cd client
+npm install
+npm install react@18 react-dom@18
+npm install -D @types/react@18 @types/react-dom@18
+npm install tailwindcss @tailwindcss/vite
+npm install clsx tailwind-merge</pre>
+    <p>Add <code>tailwindcss()</code> to the Vite plugins array; add the <code>/api</code> proxy entry now (§8) even though nothing calls it yet. <code>index.css</code> gets the full design system from §7. <code>utils/cn.ts</code> defines the shared <code>cn()</code> helper (§3.1) every component will use from Phase 2 onward. <code>App.tsx</code> renders a "WebGenie" placeholder heading using <code>.card</code>/<code>.btn-primary</code> to prove styling is wired.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p><code>npm run dev</code> → open <code>http://localhost:5173</code> → confirm the placeholder renders in the Urbanist font with the indigo primary color and card shadow (not default unstyled HTML), and that there are no TypeScript compile errors in the terminal.</p>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 2 — Pages, Routing, Navbar</span>
+  <span class="phase-sub">Deliverable: a clickable app skeleton — every page reachable, empty but styled.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files (every page/component follows the §3.1 folder pattern): <code>src/pages/{HomePage,LoginPage,RegisterPage,MyProjectsPage,CommunityPage,BuilderPage,PublicPreviewPage,NotFoundPage}/{Name.tsx,Name.styles.ts,index.ts}</code> (placeholder shells), <code>src/components/Navbar/{Navbar.tsx,Navbar.styles.ts,index.ts}</code>, <code>src/routes/AppRoutes.tsx</code>, <code>src/constants/routes.ts</code>, <code>src/App.tsx</code> (wires router).</p>
+    <pre>npm install react-router-dom@6</pre>
+    <p><code>constants/routes.ts</code> centralizes every path as typed constants/functions (<code>ROUTES.HOME</code>, <code>ROUTES.BUILDER(id: string)</code>, ...) so no page ever hardcodes a URL string. <code>AppRoutes.tsx</code> is the single route table consumed by <code>App.tsx</code>, wrapped in <code>BrowserRouter</code> with <code>Navbar</code> always visible. Each folder's <code>index.ts</code> is <code>export { default } from "./HomePage";</code> — consumers import the folder (<code>import HomePage from "@/pages/HomePage"</code>), never the inner file directly.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Click every Navbar link and also type each URL directly in the address bar — every route renders its placeholder heading, no console errors, no broken links.</p>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 3 — Redux Store + Login / Register UI (mock mode)</span>
+  <span class="phase-sub">Deliverable: working-feeling auth forms, no backend yet.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>src/store/{index,hooks}.ts</code>, <code>src/store/slices/authSlice.ts</code>, <code>src/types/auth.types.ts</code>, <code>src/services/api.ts</code>, <code>src/services/authService.ts</code>, <code>src/hooks/useAuth.ts</code>, <code>src/components/ProtectedRoute/{ProtectedRoute.tsx,index.ts}</code> (no <code>.styles.ts</code> — pure logic wrapper, §3.1), <code>src/pages/{LoginPage,RegisterPage}/{Name.tsx,Name.styles.ts,index.ts}</code> (fleshed out), <code>src/utils/validators.ts</code>.</p>
+    <pre>npm install @reduxjs/toolkit react-redux</pre>
+    <p><code>services/api.ts</code>: <code>axios.create({ baseURL: '/api', withCredentials: true })</code>. <code>store/slices/authSlice.ts</code> defines <code>AuthState { user: User | null, status }</code> with a <code>createAsyncThunk</code> per auth action; in mock mode the thunks resolve a fake user locally — no network call yet, so the rest of the UI can be built against a stable shape before Phase 8 swaps in real API calls. <code>store/index.ts</code> wires <code>configureStore</code> and exports <code>RootState</code>/<code>AppDispatch</code>; <code>store/hooks.ts</code> exports the typed <code>useAppDispatch</code>/<code>useAppSelector</code> (§8). <code>hooks/useAuth.ts</code> wraps the slice into a simple <code>{user, login, register, logout, status}</code> API for components to consume. <code>ProtectedRoute.tsx</code> redirects to <code>/login</code> when <code>user</code> is null, guarding <code>/projects</code> and <code>/builder/:id</code>. <code>LoginPage.styles.ts</code>/<code>RegisterPage.styles.ts</code> hold each form's own literal classes, referencing <code>.input-field</code>/<code>.btn-primary</code> from the global stylesheet.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Submit both forms with valid input → redirected to <code>/projects</code>; Navbar shows logged-in state (name + logout button) driven by Redux; try visiting <code>/projects</code> logged-out first — confirm you're bounced to <code>/login</code>. All without a backend running.</p>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 2 — Frontend Core (Phases 4–6, the biggest FE work)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 4 — Home Page UI</span>
+  <span class="phase-sub">Deliverable: the marketing/landing hero with a working prompt box.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>src/pages/HomePage/{HomePage.tsx,HomePage.styles.ts,index.ts}</code> (fleshed out), <code>src/components/ProjectCard/{ProjectCard.tsx,ProjectCard.styles.ts,index.ts}</code> (built now, reused in Phases 6 &amp; 12), <code>src/types/project.types.ts</code> (early <code>Project</code>/<code>FileEntry</code> types mirroring the Mongo schema).</p>
+    <p>Hero section + large prompt textarea + "Generate" button, all using <code>.card</code>/<code>.input-field</code>/<code>.btn-primary</code>. In mock mode, submitting navigates to <code>/builder/mock-id</code> carrying the prompt in state/context.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Type a prompt, click Generate → lands on the (still placeholder) Builder page with the prompt visible somewhere (e.g. as the first chat message) — proves page-to-page state hand-off before Sandpack exists.</p>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 5 — Builder Page (Sandpack + Chat + Toolbar)</span>
+  <span class="phase-sub">Deliverable: a live, editable code sandbox with working zip export — the heaviest frontend phase.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>src/pages/BuilderPage/{BuilderPage.tsx,BuilderPage.styles.ts,index.ts}</code>, <code>src/components/{ChatPanel,BuilderToolbar,DeviceToggle}/{Name.tsx,Name.styles.ts,index.ts}</code>, <code>src/utils/{sandpackUtils,exportProject}.ts</code>, <code>src/store/slices/projectSlice.ts</code> (mock project state, managed via Redux now).</p>
+    <pre>npm install @codesandbox/sandpack-react
+npm install jszip file-saver
+npm install -D @types/file-saver</pre>
+    <p><code>sandpackUtils.ts</code>: a typed <code>toSandpackFiles(files: Record&lt;string, FileEntry&gt;)</code> mapper (§8) + a light Sandpack theme matching the design tokens. <code>BuilderPage.tsx</code> holds mock <code>project</code> state (<code>/App.js</code> + <code>/styles.css</code>) via <code>projectSlice</code> and renders:</p>
+    <pre>&lt;SandpackProvider key={project.version} template="react" theme={webgenieSandpackTheme} files={toSandpackFiles(project.files)}&gt;
+  &lt;SandpackLayout&gt;
+    &lt;SandpackCodeEditor /&gt;
+    &lt;SandpackPreview /&gt;
+  &lt;/SandpackLayout&gt;
+&lt;/SandpackProvider&gt;</pre>
+    <p>...plus <code>ChatPanel</code> (mock-echo replies for now) and <code>BuilderToolbar</code> (Export / Publish stub / <code>DeviceToggle</code>). <code>exportProject.ts</code> is fully real already (100% client-side, typed against the <code>Project</code> type): builds a real Vite+React project zip via JSZip (own <code>package.json</code>, <code>vite.config.js</code>, <code>index.html</code>, <code>src/main.jsx</code>, plus every project file) and downloads it via <code>file-saver</code>.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <ol>
+      <li>Mock code renders live in the preview pane.</li>
+      <li>Editing code in the editor live-updates the preview.</li>
+      <li>Click Export → unzip the downloaded file → run <code>npm install &amp;&amp; npm run dev</code> inside it → confirm it's a real, independently working Vite+React app. This is the true correctness gate for export since there's no backend to catch mistakes.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 6 — Public Preview + Publish Toggle UI</span>
+  <span class="phase-sub">Deliverable: a read-only shareable preview page.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>src/pages/PublicPreviewPage/{PublicPreviewPage.tsx,PublicPreviewPage.styles.ts,index.ts}</code> (read-only <code>SandpackPreview</code> only, no editor/chat), <code>components/BuilderToolbar/{BuilderToolbar.tsx,BuilderToolbar.styles.ts}</code> (publish toggle wired to mock state + a "Published"/"Draft" badge).</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Toggle Publish in the Builder → badge flips; visit <code>/public/mock-id</code> → same files render read-only, no code editor, no chat panel visible.</p>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 3 — Backend Skeleton + Auth (Phases 7–8)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 7 — FastAPI Skeleton + Motor + Atlas Connection</span>
+  <span class="phase-sub">Deliverable: an empty but real, connected API with auto-docs.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none (Atlas already set up in Phase 0)</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>server/app/{main,config,database,models}.py</code>, <code>server/requirements.txt</code>, <code>server/.env</code>.</p>
+    <pre>mkdir server
+cd server
+py -3.13 -m venv venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000</pre>
+    <p><code>.env</code> receives the five Phase-0 values plus <code>JWT_ALGORITHM=HS256</code>, <code>JWT_EXPIRE_MINUTES</code>, <code>OPENROUTER_BASE_URL=https://openrouter.ai/api/v1</code>, <code>CORS_ORIGIN=http://localhost:5173</code>, <code>COOKIE_NAME=webgenie_token</code>. <code>database.py</code> creates the Motor client and exposes <code>db</code>. <code>models.py</code> defines Pydantic mirrors of the <code>users</code>/<code>projects</code> documents.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Open <code>http://localhost:8000/docs</code> → Swagger UI loads. Hit a temporary health route that calls <code>db.list_collection_names()</code> → confirms the Atlas connection string actually works.</p>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 8 — Real Authentication APIs</span>
+  <span class="phase-sub">Deliverable: real accounts, real sessions — mock mode retired.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>server/app/auth/{security,dependencies}.py</code>, <code>server/app/routers/auth_router.py</code>, <code>server/app/main.py</code> (mount router); client: <code>src/store/slices/authSlice.ts</code> + <code>src/services/authService.ts</code> (swap mock thunks for real <code>api.post('/auth/...')</code> calls).</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Register a real account via the UI → open Atlas → confirm a new document in <code>users</code> with a bcrypt hash, not plaintext. Refresh the page → still logged in (<code>/api/auth/me</code> works via cookie). Log out → cookie cleared, redirected to <code>/login</code>.</p>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 4 — AI Generation Pipeline (Phases 9–10, the hardest backend work)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 9 — AI Site Generation (POST /api/projects + WebSocket)</span>
+  <span class="phase-sub">Deliverable: a real prompt produces a real, working multi-file site, live.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>server/app/ai/{schemas,prompts,service,normalizer,validator}.py</code>, <code>server/app/routers/{projects_router,ws_router}.py</code>; client: <code>vite.config.ts</code> (add the <code>/ws</code> proxy from §8), <code>src/services/{projectService,socketService}.ts</code>, <code>src/pages/BuilderPage/BuilderPage.tsx</code> (real WS, typed events, replacing Phase 5's mock data).</p>
+    <p>In <code>service.py</code>: plan phase is one <code>instructor</code> call against <code>FilePlanSchema</code> — if the model's plan omits <code>/App.js</code> or <code>/styles.css</code>, inject them manually rather than trusting the schema. Generation phase runs concurrently via <code>asyncio.Semaphore(6)</code> + <code>asyncio.gather</code>, each file normalized then validated; up to 2 retry rounds for any failing file; if <code>/App.js</code> still fails, insert a static placeholder component so the project is never totally unrenderable.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Type a real prompt on the Home page → watch <code>plan</code> then per-file <code>file_start</code>/<code>file_complete</code> events stream into the Builder UI live → ends with <code>done</code> → Sandpack renders the actual AI-generated site. Check Atlas: the project document shows <code>status: "completed"</code> with populated <code>files</code>.</p>
+  </div>
+</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 10 — OpenRouter Model Tuning</span>
+  <span class="phase-sub">Deliverable: reliable, good-looking generations across varied prompts. No new files.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none (unless you want to try a different free model)</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Run 5–10 generations back to back with varied prompts ("developer portfolio", "todo app", "bakery landing page"). Tune <code>extra_body={"provider": {"require_parameters": True}}</code>, the design-quality system prompt rules in <code>prompts.py</code> (light-mode-by-default, typography scale, single-file rule for small apps), and retry/concurrency settings if the free-tier rate limit gets hit.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>Run the batch of test prompts yourself — each should finish <code>status: completed</code> with no placeholder-fallback triggered, and the generated sites should look reasonably clean by default.</p>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 5 — Revision Agent (Phase 11)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 11 — Agent Chat API (revisions) + Manual Save</span>
+  <span class="phase-sub">Deliverable: "make the header dark blue" actually only changes the header.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>server/app/ai/diff.py</code> (<code>apply_operations</code>, md5 hashing), <code>schemas.py</code> (add <code>RevisionResultSchema</code>/<code>FileOpSchema</code>), <code>service.py</code> (add <code>revise_project</code>), <code>ws_router.py</code> (add chat WS), <code>projects_router.py</code> (add <code>PUT /files</code>); client: <code>src/components/ChatPanel/ChatPanel.tsx</code> (real WS, updates files via <code>projectSlice</code> + bumps local <code>version</code> to trigger the Sandpack remount from Phase 5), <code>src/hooks/useDebounce.ts</code> + <code>src/pages/BuilderPage/BuilderPage.tsx</code> (manual edits → debounce → <code>PUT /files</code>).</p>
+    <p><code>revise_project</code> context sent to the AI: a file manifest (path + hash + size only, <b>not</b> full content, to save tokens) for every file, full content only for files judged relevant to the request, plus the last 3 chat messages. One <code>instructor</code> call against <code>RevisionResultSchema</code> returns ops; <code>diff.py</code> applies them with exact-match search/replace first, falling back to whitespace-normalized matching. Bumps <code>version</code>, appends both the user prompt and an assistant summary to <code>messages</code>, persists, streams result, closes socket.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <ol>
+      <li>Type "change the button color to green" in ChatPanel → only the relevant file changes (check Atlas: untouched files keep the same <code>hash</code>).</li>
+      <li>Manually edit code in the Sandpack editor, wait for the debounce, reload the page → your edit persisted.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="chunk-banner">CHUNK 6 — Integration &amp; Dashboards (Phase 12)</div>
+
+<div class="phase">
+  <span class="phase-head">Phase 12 — Listing, Community, Publish, Delete</span>
+  <span class="phase-sub">Deliverable: the full product loop works end-to-end.</span>
+  <div class="tag-row"><span class="badge badge-none">Manual: none</span></div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-code">Code — Us</span></div>
+    <p>Files: <code>projects_router.py</code> (add list / full-get / publish / delete), <code>community_router.py</code> (public no-auth get); client: <code>src/services/projectService.ts</code> (real calls), <code>src/pages/{MyProjectsPage,CommunityPage,PublicPreviewPage}/Name.tsx</code> (real data), <code>components/BuilderToolbar/BuilderToolbar.tsx</code> (real publish call), delete with a confirm dialog.</p>
+  </div>
+  <div class="subblock">
+    <div class="subblock-title"><span class="badge badge-test">Test — You</span></div>
+    <p>The full loop, in order: register → prompt on Home → watch live generation → chat-revise it → manually edit a file → export the zip (confirm it runs standalone) → publish it → open <code>/public/{id}</code> in an incognito window with no login → confirm it renders read-only → delete the project → confirm it's gone from both Atlas and the Community list.</p>
+  </div>
+</div>
+
+</div>
+
+<!-- 10 -->
+<div class="section">
+<h2>10. Final End-to-End Test Checklist</h2>
+<ul class="checklist">
+  <li>Register + login + logout + session-persists-on-refresh all work</li>
+  <li>Home page prompt → live streamed generation → completed site renders in Sandpack</li>
+  <li>Manual code edit in Sandpack persists after reload</li>
+  <li>Chat revision changes only the relevant file(s), preserves everything else's hash</li>
+  <li>Export produces a zip that runs standalone with <code>npm install && npm run dev</code></li>
+  <li>Publish toggle works; public link opens read-only with no login required</li>
+  <li>My Projects dashboard lists your projects; Community lists published ones from other/incognito sessions</li>
+  <li>Delete removes the project from the database and both dashboards</li>
+  <li>UI is visually consistent across every page (same fonts, colors, button/card styles from §7)</li>
+</ul>
+</div>
+
+<!-- 11 -->
+<div class="section">
+<h2>11. Resume Bullet (once built)</h2>
+<div class="callout">
+"Built a full-stack AI SaaS website builder (React/Vite + Sandpack + FastAPI + MongoDB) where users generate multi-file React websites from natural-language prompts, watch generation happen file-by-file in real time over WebSockets, revise the site through an AI chat agent that applies precise create/update/delete file operations, edit code manually in an embedded sandbox, and export or publish the result. Integrated an open-source LLM via OpenRouter's free tier; entire stack runs on free infrastructure (MongoDB Atlas, OpenRouter)."
+</div>
+</div>
+
+</body>
+</html>
